@@ -59,6 +59,8 @@ public class Player extends PhysicalObject {
 	public boolean charged = false;
 	public boolean sprinting = false;
 	
+	public boolean charging = false;
+	
 	public Sound step_1 = new Sound("sounds/step_1.wav");
 	public Sound step_2 = new Sound("sounds/step_2.wav");
 	
@@ -419,6 +421,25 @@ public class Player extends PhysicalObject {
 		
 	}
 	
+	public boolean check_charging () {
+		
+		Tile tile_1 = Dimmer.game.h.level.get_id_at((int) x, (int) y + 1);
+		Tile tile_2 = Dimmer.game.h.level.get_id_at((int) x + 4, (int) y + 1);
+		Tile tile_3 = Dimmer.game.h.level.get_id_at((int) x, (int) y + 11);
+		Tile tile_4 = Dimmer.game.h.level.get_id_at((int) x + 4, (int) y + 11);
+		
+		if (tile_1 != null) if (tile_1.charger()) return true;
+		
+		if (tile_2 != null) if (tile_2.charger()) return true;
+		
+		if (tile_3 != null) if (tile_3.charger()) return true;
+		
+		if (tile_4 != null) if (tile_4.charger()) return true;
+		
+		return false;
+		
+	}
+	
 	public void update (Engine e) {
 		
 		if (Dimmer.game.right_pressed() && !Dimmer.game.left_pressed()) {
@@ -498,6 +519,9 @@ public class Player extends PhysicalObject {
 		else charged = false;
 		
 		updatePhysics(e);
+		
+		if (check_charging()) charging = true;
+		else charging = false;
 		
 		if (check_fatality()) Dimmer.game.game_over();
 		

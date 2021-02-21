@@ -9,5 +9,6 @@ public interface Tile {
 	public double get_ID();
 	public boolean solid();
 	public boolean fatal();
+	public boolean charger();
 	
 }

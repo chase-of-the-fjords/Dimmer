@@ -32,6 +32,8 @@ public class Level {
 	public static Sprite box = new Sprite("/tiles/box.png");
 	public static Sprite bricks = new Sprite("/tiles/bricks.png");
 	
+	public static Sprite plug = new Sprite("/tiles/plug.png");
+	
 	public static Sprite battery = new Sprite("/tiles/battery.png");
 	
 	public Action zap_flicker = new Action(50, 0);
@@ -208,6 +210,12 @@ public class Level {
 				
 			}
 			
+			public boolean charger() {
+				
+				return false;
+				
+			}
+			
 		});
 		
 		all_tiles.add(new Tile() {
@@ -249,13 +257,19 @@ public class Level {
 				
 			}
 			
+			public boolean charger() {
+				
+				return false;
+				
+			}
+			
 		});
 		
 		all_tiles.add(new Tile() {
 			
 			public Sprite get_sprite(boolean u, boolean d, boolean l, boolean r) {
 				
-				return Dimmer.game.h.level.zap[Dimmer.game.h.level.current_zap];
+				return Level.zap[Dimmer.game.h.level.current_zap];
 				
 			}
 			
@@ -280,6 +294,12 @@ public class Level {
 			public boolean fatal() {
 				
 				return true;
+				
+			}
+			
+			public boolean charger() {
+				
+				return false;
 				
 			}
 			
@@ -319,6 +339,12 @@ public class Level {
 			}
 
 			public boolean fatal() {
+				
+				return false;
+				
+			}
+			
+			public boolean charger() {
 				
 				return false;
 				
@@ -368,6 +394,52 @@ public class Level {
 				
 			}
 			
+			public boolean charger() {
+				
+				return false;
+				
+			}
+			
+		});
+		
+		all_tiles.add(new Tile() {
+			
+			public Sprite get_sprite(boolean u, boolean d, boolean l, boolean r) {
+				
+				return Level.plug;
+				
+			}
+			
+			public String get_name() {
+				
+				return "plug";
+				
+			}
+			
+			public double get_ID() {
+				
+				return 5;
+				
+			}
+
+			public boolean solid() {
+				
+				return false;
+				
+			}
+
+			public boolean fatal() {
+				
+				return false;
+				
+			}
+			
+			public boolean charger() {
+				
+				return true;
+				
+			}
+			
 		});
 		
 	}
@@ -396,6 +468,7 @@ public class Level {
 				else if (s.pixels[x + (y * s.width)] == 0xFFffff00) tiles[x][y] = all_tiles.get(2);
 				else if (s.pixels[x + (y * s.width)] == 0xFF222222) tiles[x][y] = all_tiles.get(3);
 				else if (s.pixels[x + (y * s.width)] == 0xFFcccccc) tiles[x][y] = all_tiles.get(4);
+				else if (s.pixels[x + (y * s.width)] == 0xFF00ffff) tiles[x][y] = all_tiles.get(5);
 				else tiles[x][y] = null;
 				
 			}

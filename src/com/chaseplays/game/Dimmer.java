@@ -284,7 +284,16 @@ public class Dimmer extends Game {
 				
 				if (music.active()) music.setVolume((screen_opacity / 100.0));
 				
-				if (screen_opacity > 0) screen_opacity -= 1;
+				if (!p.charging && screen_opacity > 0) {
+					
+					screen_opacity -= 1;
+					
+				} else if (p.charging) {
+					
+					if (screen_opacity < 100) screen_opacity += 5;
+					if (screen_opacity > 100) screen_opacity = 100;
+					
+				}
 				else {
 					
 					game_over();
