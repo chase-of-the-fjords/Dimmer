@@ -359,7 +359,7 @@ public class Dimmer extends Game {
 			
 			if (battery_level >= 0) screen.on.render(3, 3, battery_power[battery_level]);
 			
-			// screen.on.render(0, 0, darkness.opacity(1 - (screen_opacity / 100.0)));
+			screen.on.render(0, 0, darkness.opacity(1 - (screen_opacity / 100.0)));
 			
 			if (turning_off) {
 				
