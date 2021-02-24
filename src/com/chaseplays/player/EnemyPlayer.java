@@ -9,87 +9,58 @@ import com.chaseplays.engine.sound.Sound;
 import com.chaseplays.game.Dimmer;
 import com.chaseplays.level.Tile;
 
-public class Player extends PhysicalObject {
+public class EnemyPlayer extends PhysicalObject {
 		
 	public Sprite sprite; // the sprite of the object
 	
-	public static Sprite[] run_right = { new Sprite("/player/run_right1.png"),
-								new Sprite("/player/run_right2.png"),
-								new Sprite("/player/run_right3.png"),
-								new Sprite("/player/run_right4.png")};
+	public static Sprite[] run_right = { new Sprite("/player/enemy/run_right1.png"),
+								new Sprite("/player/enemy/run_right2.png"),
+								new Sprite("/player/enemy/run_right3.png"),
+								new Sprite("/player/enemy/run_right4.png")};
 	
-	public static Sprite[] run_left = { new Sprite("/player/run_left1.png"),
-								new Sprite("/player/run_left2.png"),
-								new Sprite("/player/run_left3.png"),
-								new Sprite("/player/run_left4.png")};
+	public static Sprite[] run_left = { new Sprite("/player/enemy/run_left1.png"),
+								new Sprite("/player/enemy/run_left2.png"),
+								new Sprite("/player/enemy/run_left3.png"),
+								new Sprite("/player/enemy/run_left4.png")};
 	
-	public static Sprite default_sprite = new Sprite("/player/default.png");
+	public static Sprite default_sprite = new Sprite("/player/enemy/default.png");
 	
-	public static Sprite what = new Sprite("/player/what.png");
+	public static Sprite what = new Sprite("/player/enemy/what.png");
 
-	public static Sprite airborne = new Sprite("/player/jumping.png");
-	
-	public static Sprite[] e_run_right = { new Sprite("/player/e_run_right1.png"),
-								new Sprite("/player/e_run_right2.png"),
-								new Sprite("/player/e_run_right3.png"),
-								new Sprite("/player/e_run_right4.png")};
-
-	public static Sprite[] e_run_left = { new Sprite("/player/e_run_left1.png"),
-								new Sprite("/player/e_run_left2.png"),
-								new Sprite("/player/e_run_left3.png"),
-								new Sprite("/player/e_run_left4.png")};
+	public static Sprite airborne = new Sprite("/player/enemy/jumping.png");
 	
 	public static Sprite[] r_sword = { new Sprite("/player/sword_r1.png"),
-								new Sprite("/player/sword_r2.png"),
-								new Sprite("/player/sword_r3.png")};
-	
+						new Sprite("/player/sword_r2.png"),
+						new Sprite("/player/sword_r3.png")};
+
 	public static Sprite[] l_sword = { new Sprite("/player/sword_l1.png"),
-								new Sprite("/player/sword_l2.png"),
-								new Sprite("/player/sword_l3.png")};
-	
-	public static Sprite e_default_sprite = new Sprite("/player/e_default.png");
-	
-	public static Sprite e_what = new Sprite("/player/e_what.png");
-	
-	public static Sprite e_airborne = new Sprite("/player/e_jumping.png");
-	
-	public static Sprite battery = new Sprite("/player/battery.png");
+						new Sprite("/player/sword_l2.png"),
+						new Sprite("/player/sword_l3.png")};
 	
 	public int run_frame = 1;
 	
 	public Action run = new Action(150, 0);
-	public Action battery_bobble = new Action(5, 0);
+	public Action sword_freq = new Action(2000, 0);
+	
+	public static Sound jump_sfx = new Sound("sounds/jump.wav");
+	public static Sound land_sfx = new Sound("sounds/land.wav");
+	
+	public double gravity_resistance;
 	
 	public Action sword_swing = new Action(50, 0);
 	public int sword_stage = 0;
 	public boolean swinging_sword = false;
 	
-	public int bobble = 0;
-	
-	public boolean carrying_battery = false;
-	
-	public boolean charged = false;
-	public boolean sprinting = false;
-	
-	public boolean charging = false;
-	
-	public static Sound step_1 = new Sound("sounds/step_1.wav");
-	public static Sound step_2 = new Sound("sounds/step_2.wav");
-	
-	public static Sound jump_sfx = new Sound("sounds/jump.wav");
-	public static Sound land_sfx = new Sound("sounds/land.wav");
-	
-	public static Sound collect_sfx = new Sound("sounds/collect.wav");
-	
-	public static Sound dash = new Sound("sounds/dash.wav");
-	
-	public static Sound swing = new Sound("sounds/swing.wav");
-	
-	public double gravity_resistance;
-	
 	public int last_dir_moved = 1;
 	
-	public Player () {
+	public int direction = 1;
+	public int start_direction;
+	
+	public int start_y;
+	
+	public int min_x, max_x;
+	
+	public EnemyPlayer (int min_x, int max_x, int y, int start_direction) {
 		
 		pWidth = 5; // player's width
 		pHeight = 11; // player's height
@@ -102,11 +73,23 @@ public class Player extends PhysicalObject {
 		
 		h_decay = 0.04; // the rate at which the velocity decreases (horizontally)
 		h_acceleration = 0.08; // the speed at which moving increases the player speed
-		maximum_h_velocity = 0.5; // maximum velocity while moving
+		maximum_h_velocity = 0.25; // maximum velocity while moving
+		
+		this.y = y;
+		this.start_y = y;
+		
+		this.min_x = min_x;
+		this.max_x = max_x;
+		
+		this.direction = start_direction;
+		this.start_direction = start_direction;
+		
+		if (start_direction == -1) this.x = max_x;
+		if (start_direction == 1) this.x = min_x;
+		
+		sword_freq.start();
 		
 		sprite = new Sprite(0xFFFF0000, pWidth, pHeight); // sets the sprite
-		
-		battery_bobble.start();
 		
 	}
 	
@@ -123,31 +106,29 @@ public class Player extends PhysicalObject {
 		
 		h_decay = 0.04; // the rate at which the velocity decreases (horizontally)
 		h_acceleration = 0.08; // the speed at which moving increases the player speed
-		maximum_h_velocity = 0.5; // maximum velocity while moving
+		maximum_h_velocity = 0.25; // maximum velocity while moving
 		
 		sprite = new Sprite(0xFFFF0000, pWidth, pHeight); // sets the sprite
-		
-		battery_bobble.start();
 		
 		run_frame = 1;
 		
 		run = new Action(150, 0);
-		battery_bobble = new Action(5, 0);
-		
-		battery_bobble.start();
-		
-		bobble = 0;
-		
-		carrying_battery = false;
-		sprinting = false;
 		
 		v_velocity = 0;
 		
 		h_velocity = 0;
 		
+		y = start_y;
+		direction = start_direction;
+		
+		if (start_direction == -1) this.x = max_x;
+		if (start_direction == 1) this.x = min_x;
+		
 		jump = new TechAction(1);
 		
 		move = new TechAction(1);
+		
+		sword_freq.start();
 		
 		landTech = 0;
 		
@@ -160,65 +141,6 @@ public class Player extends PhysicalObject {
 		 * Deals with vertical velocity calculations
 		 * 
 		 */
-		
-		if ((!Dimmer.game.level_locked || Dimmer.game.current_hallway >= 2) && (e.key.shift.typed() || e.key.x.typed()) && last_dir_moved == 1) {
-
-			Dimmer.game.screen_opacity -= 4;
-			
-			h_velocity = 2.3;
-
-			v_velocity = 0;
-			
-			dash.play();
-			
-		}
-		if ((!Dimmer.game.level_locked || Dimmer.game.current_hallway >= 2) && (e.key.shift.typed() || e.key.x.typed()) && last_dir_moved == -1) {
-			
-			Dimmer.game.screen_opacity -= 4;
-			
-			h_velocity = -2.3;
-
-			v_velocity = 0;
-			
-			dash.play();
-			
-		}
-		if ((!Dimmer.game.level_locked || Dimmer.game.current_hallway >= 3) && (e.key.ctrl.typed() || e.key.z.typed())) {
-			
-			Dimmer.game.screen_opacity -= 1;
-			Dimmer.game.dim.updateEvery *= 3;
-			Dimmer.game.dim.updateEvery /= 4;
-			
-			thrust = 0.9; // upwards thrust when jumping
-			maximum_downwards_velocity = -1.5; // maximum velocity while falling
-			v_decay = 0.02; // the rate at which the velocity decreases (vertically)
-			
-			gravity_resistance = 0.008;
-			
-			h_decay = 0.02; // the rate at which the velocity decreases (horizontally)
-			h_acceleration = 0.12; // the speed at which moving increases the player speed
-			maximum_h_velocity = 1; // maximum velocity while moving
-			
-			sprinting = true;
-			
-		}
-		else if (!e.key.ctrl.pressed() && !e.key.z.pressed() && sprinting) {
-			
-			Dimmer.game.dim.updateEvery = Dimmer.game.h.timer;
-			
-			thrust = 1.1; // upwards thrust when jumping
-			maximum_downwards_velocity = -1.5; // maximum velocity while falling
-			v_decay = 0.04; // the rate at which the velocity decreases (vertically)
-			
-			gravity_resistance = 0.02;
-			
-			h_decay = 0.04; // the rate at which the velocity decreases (horizontally)
-			h_acceleration = 0.08; // the speed at which moving increases the player speed
-			maximum_h_velocity = 0.5; // maximum velocity while moving
-			
-			sprinting = false;
-			
-		}
 		
 		if (jump.able()) {
 			
@@ -326,7 +248,7 @@ public class Player extends PhysicalObject {
 				
 			}
 			
-			if (Dimmer.game.right_pressed() && !Dimmer.game.left_pressed()) {
+			if (direction == 1) {
 				
 				if (h_velocity < maximum_h_velocity) {
 					
@@ -344,7 +266,7 @@ public class Player extends PhysicalObject {
 				
 			}
 			
-			if (!Dimmer.game.right_pressed() && Dimmer.game.left_pressed()) {
+			if (direction == -1) {
 				
 				if (h_velocity > -1 * maximum_h_velocity) {
 					
@@ -366,13 +288,13 @@ public class Player extends PhysicalObject {
 			
 		}
 		
-		if (Dimmer.game.up_typed() && grounded() && landTech == 0) if (Math.abs(h_velocity) < 1.2) {
+		/*if (Dimmer.game.up_typed() && grounded() && landTech == 0) if (Math.abs(h_velocity) < 1.2) {
 			
 			v_velocity = thrust;
 			
 			jump_sfx.play();
 			
-		}
+		}*/
 		
 		if (v_velocity == 0 && grounded()) y = (int) y;
 		if (h_velocity == 0) x = (int) x;
@@ -380,13 +302,13 @@ public class Player extends PhysicalObject {
 		if (landTech > 0) landTech--;
 		if (!Dimmer.game.up_pressed()) landTech = 0;
 		
-		if (Dimmer.game.c_typed() && !swinging_sword) {
+		if (sword_freq.able() && !swinging_sword) {
+			
+			sword_freq.gather();
 			
 			swinging_sword = true;
 			sword_swing.start();
 			sword_stage = 0;
-			
-			swing.play();
 			
 		} else if (swinging_sword && sword_swing.able()) {
 			
@@ -401,6 +323,22 @@ public class Player extends PhysicalObject {
 				sword_stage = 0;
 				
 			}
+			
+		}
+		
+		update_direction();
+		
+	}
+	
+	public void update_direction () {
+		
+		if (direction == 1 && x > max_x) {
+			
+			direction = -1;
+			
+		} else if (direction == -1 && x < min_x) {
+			
+			direction = 1;
 			
 		}
 		
@@ -477,7 +415,7 @@ public class Player extends PhysicalObject {
 		return false;
 		
 	}
-
+	
 	public boolean is_touching (int top_left_x, int top_left_y, int width, int height) {
 		
 		boolean within_x = (x + 5 > top_left_x && x - width < top_left_x);
@@ -500,11 +438,11 @@ public class Player extends PhysicalObject {
 					
 				} else if (sword_stage == 1) {
 					
-					return new Hitbox((int) x + 5, (int) y - 3, 12, 12);
+					return null;
 					
 				} else {
 					
-					return new Hitbox((int) x + 5, (int) y - 3, 12, 12);
+					return new Hitbox((int) x + 3, (int) y - 1, 8, 8);
 					
 				}
 				
@@ -518,11 +456,11 @@ public class Player extends PhysicalObject {
 					
 				} else if (sword_stage == 1) {
 					
-					return new Hitbox((int) x - 12, (int) y - 3, 12, 12);
+					return null;
 					
 				} else {
 					
-					return new Hitbox((int) x - 12, (int) y - 3, 12, 12);
+					return new Hitbox((int) x - 10, (int) y - 1, 8, 8);
 					
 				}
 				
@@ -534,17 +472,13 @@ public class Player extends PhysicalObject {
 		
 	}
 	
-	public boolean killedBy (EnemyPlayer ep) {
+	public boolean killed () {
 		
-		Hitbox eps = ep.get_sword_hitbox();
+		Hitbox ps = Dimmer.game.p.get_sword_hitbox();
 		
-		if (eps != null) {
+		if (ps != null) {
 			
-			if (is_touching(eps.x, eps.y, eps.width, eps.height)) {
-				
-				return true;
-				
-			}
+			return is_touching(ps.x, ps.y, ps.width, ps.height);
 			
 		}
 		
@@ -554,7 +488,7 @@ public class Player extends PhysicalObject {
 	
 	public void update (Engine e) {
 		
-		if (Dimmer.game.right_pressed() && !Dimmer.game.left_pressed()) {
+		if (direction == 1) {
 			
 			if (run.able()) {
 				
@@ -563,8 +497,8 @@ public class Player extends PhysicalObject {
 				
 				run.gather();
 				
-				if (run_frame == 1 && grounded()) step_2.play();
-				if (run_frame == 3 && grounded()) step_1.play();
+				//if (run_frame == 1 && grounded()) step_2.play();
+				//if (run_frame == 3 && grounded()) step_1.play();
 				
 			}
 			
@@ -576,7 +510,7 @@ public class Player extends PhysicalObject {
 				
 			}
 			
-		} else if (Dimmer.game.left_pressed() && !Dimmer.game.right_pressed()) {
+		} else if (direction == -1) {
 			
 			if (run.able()) {
 				
@@ -585,8 +519,8 @@ public class Player extends PhysicalObject {
 				
 				run.gather();
 				
-				if (run_frame == 1 && grounded()) step_2.play();
-				if (run_frame == 3 && grounded()) step_1.play();
+				//if (run_frame == 1 && grounded()) step_2.play();
+				//if (run_frame == 3 && grounded()) step_1.play();
 				
 			}
 			
@@ -600,40 +534,14 @@ public class Player extends PhysicalObject {
 			
 		} else if (run.active) {
 			
-			if (run_frame == 2) step_1.play();
-			if (run_frame == 4) step_2.play();
+			//if (run_frame == 2) step_1.play();
+			//if (run_frame == 4) step_2.play();
 			
 			run.stop();
 			
 		}
 		
-		while (battery_bobble.able()) {
-			
-			bobble++;
-			bobble %= 360;
-			
-			battery_bobble.gather();
-			
-		}
-		
-		if (Dimmer.game.h.level.touching_battery((int) x, (int) y)) {
-			
-			carrying_battery = true;
-			
-			Dimmer.game.h.level.battery_active = false;
-			
-			collect_sfx.play();
-			
-		}
-		
-		if (Math.abs(h_velocity) > Math.abs(maximum_h_velocity) + 0.01) charged = true;
-		else if (sprinting) charged = true;
-		else charged = false;
-		
 		updatePhysics(e);
-		
-		if (check_charging()) charging = true;
-		else charging = false;
 		
 		if (check_fatality()) Dimmer.game.game_over();
 		
@@ -641,23 +549,9 @@ public class Player extends PhysicalObject {
 	
 	public void render (Engine e) {
 		
-		if (!charged) {
-			
-			if (Dimmer.game.right_pressed() && !Dimmer.game.left_pressed()) sprite = run_right[run_frame];
-			else if (Dimmer.game.left_pressed() && !Dimmer.game.right_pressed()) sprite = run_left[run_frame];
-			else if (Dimmer.game.down_pressed() || (Dimmer.game.left_pressed() && Dimmer.game.right_pressed())) sprite = what;
-			else sprite = default_sprite;
-			
-		} else {
-			
-			if (h_velocity > 1.2 && !Dimmer.game.left_pressed()) sprite = e_run_right[run_frame];
-			else if (h_velocity < -1.2 && !Dimmer.game.right_pressed()) sprite = e_run_left[run_frame];
-			else if (Dimmer.game.right_pressed() && !Dimmer.game.left_pressed()) sprite = e_run_right[run_frame];
-			else if (Dimmer.game.left_pressed() && !Dimmer.game.right_pressed()) sprite = e_run_left[run_frame];
-			else if (Dimmer.game.down_pressed() || (Dimmer.game.left_pressed() && Dimmer.game.right_pressed())) sprite = e_what;
-			else sprite = e_default_sprite;
-			
-		}
+		if (direction == 1) sprite = run_right[run_frame];
+		else if (direction == -1) sprite = run_left[run_frame];
+		else sprite = default_sprite;
 		
 		if (swinging_sword) {
 			
@@ -700,8 +594,6 @@ public class Player extends PhysicalObject {
 		}
 		
 		e.screen.in.render((int) x - 1, (int) y, sprite); // render the object
-		
-		if (carrying_battery) e.screen.in.render((int) x - 6, (int) y - 8 - (int) Math.round(1 * Math.sin(2 * Math.PI * ((bobble) / 360.0))), battery);
 		
 	}
 	

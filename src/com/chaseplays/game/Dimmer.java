@@ -13,6 +13,7 @@ import com.chaseplays.engine.text.Text;
 import com.chaseplays.level.Hallway;
 import com.chaseplays.level.Level;
 import com.chaseplays.level.PathZap;
+import com.chaseplays.player.EnemyPlayer;
 import com.chaseplays.player.Player;
 
 public class Dimmer extends Game {
@@ -119,16 +120,46 @@ public class Dimmer extends Game {
 		
 		Level.generate_tiles();
 		
-		h_progression.add(new Hallway(280, "sounds/music/level_one.wav", "/rooms/room1_on.png", "/levels/level_1.png", "/rooms/room2_off.png", 34, 3));
+		h_progression.add(new Hallway(280, "sounds/music/level_one.wav", "/rooms/room1_on.png", "/levels/level_1.png", "/rooms/room2_off.png", 34, 3) {
+			
+			@Override
+			public void setup() {
+				
+				level.enemies.add(new EnemyPlayer(716, 766, 96, 1));
+				
+			}
+			
+		});
 		
-		h_progression.add(new Hallway(280, "sounds/music/level_two.wav", "/rooms/room2_on.png", "/levels/level_2.png", "/rooms/room3_off.png", 25, 2));
+		h_progression.add(new Hallway(280, "sounds/music/level_two.wav", "/rooms/room2_on.png", "/levels/level_2.png", "/rooms/room3_off.png", 25, 2) {
+			
+			@Override
+			public void setup() {
+				
+				level.enemies.add(new EnemyPlayer(866, 911, 108, 1));
+				
+			}
+			
+		});
 		
-		h_progression.add(new Hallway(360, "sounds/music/level_three.wav", "/rooms/room3_on.png", "/levels/level_3.png", "/rooms/room4_off.png", 44, 1));
+		h_progression.add(new Hallway(360, "sounds/music/level_three.wav", "/rooms/room3_on.png", "/levels/level_3.png", "/rooms/room4_off.png", 44, 1) {
+			
+			@Override
+			public void setup() {
+				
+				level.enemies.add(new EnemyPlayer(221, 278, 108, 1));
+				level.enemies.add(new EnemyPlayer(1011, 1036, 72, 1));
+				
+			}
+			
+		});
 		
 		h_progression.add(new Hallway(260, "sounds/music/level_four.wav", "/rooms/room4_on.png", "/levels/level_4.png", "/rooms/room5_off.png", 62, 1) {
 			
 			@Override
 			public void setup() {
+
+				level.enemies.add(new EnemyPlayer(650, 723, 60, 1));
 				
 				level.zaps.add(new PathZap(32, 1, 0.3, false) {
 					
@@ -163,6 +194,8 @@ public class Dimmer extends Game {
 			@Override
 			public void setup() {
 				
+				level.enemies.add(new EnemyPlayer(591, 669, 60, 1));
+				
 				level.zaps.add(new PathZap(51, 2, 0.4, false) {
 					
 					@Override
@@ -184,6 +217,8 @@ public class Dimmer extends Game {
 			
 			@Override
 			public void setup() {
+				
+				level.enemies.add(new EnemyPlayer(448, 483, 108, 1));
 				
 				level.zaps.add(new PathZap(24, 5, 0.5, false) {
 					
@@ -230,9 +265,27 @@ public class Dimmer extends Game {
 			
 		});
 		
-		h_progression.add(new Hallway(360, "sounds/music/level_eight.wav", "/rooms/room7_on.png", "/levels/level_7.png", "/rooms/room8_off.png", 13, 3));
+		h_progression.add(new Hallway(360, "sounds/music/level_eight.wav", "/rooms/room7_on.png", "/levels/level_7.png", "/rooms/room8_off.png", 13, 3) {
+			
+			@Override
+			public void setup() {
+				
+				level.enemies.add(new EnemyPlayer(215, 275, 60, 1));
+				
+			}
+			
+		});
 
-		h_progression.add(new Hallway(600, "sounds/music/level_nine.wav", "/rooms/room8_on.png", "/levels/level_8.png", "/rooms/room9_off.png", 44, 5));
+		h_progression.add(new Hallway(600, "sounds/music/level_nine.wav", "/rooms/room8_on.png", "/levels/level_8.png", "/rooms/room9_off.png", 44, 5) {
+			
+			@Override
+			public void setup() {
+				
+				level.enemies.add(new EnemyPlayer(1270, 1345, 108, 1));
+				
+			}
+			
+		});
 		
 		static_noise.loop();
 		
@@ -241,7 +294,7 @@ public class Dimmer extends Game {
 	}
 	
 	public void update () {
-
+		
 		if (second.able()) {
 			
 			second.gather();
@@ -335,8 +388,6 @@ public class Dimmer extends Game {
 	}
 	
 	public void render () {
-		
-		Random rand = new Random();
 		
 		if (screen_opacity < 0) screen_opacity = 0;
 		
@@ -597,6 +648,12 @@ public class Dimmer extends Game {
 	public boolean down_pressed() {
 		
 		return (key.down.pressed() || key.s.pressed());
+		
+	}
+	
+	public boolean c_typed() {
+		
+		return key.c.typed();
 		
 	}
 	

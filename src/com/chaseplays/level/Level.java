@@ -7,6 +7,7 @@ import com.chaseplays.engine.action.Action;
 import com.chaseplays.engine.screen.Sprite;
 import com.chaseplays.engine.sound.Sound;
 import com.chaseplays.game.Dimmer;
+import com.chaseplays.player.EnemyPlayer;
 
 public class Level {
 	
@@ -36,6 +37,8 @@ public class Level {
 	
 	public static Sprite battery = new Sprite("/tiles/battery.png");
 	
+	public Sound kill = new Sound("sounds/kill.wav");
+	
 	public Action zap_flicker = new Action(50, 0);
 	
 	public int current_zap = 0;
@@ -45,6 +48,7 @@ public class Level {
 	public int bobble = 0;
 	
 	public ArrayList<Zap> zaps = new ArrayList<Zap>();
+	public ArrayList<EnemyPlayer> enemies = new ArrayList<EnemyPlayer>();
 	
 	public static Sprite v_line = new Sprite(0xFF000000, 1, 12);
 	public static Sprite h_line = new Sprite(0xFF000000, 12, 1);
@@ -112,6 +116,7 @@ public class Level {
 		zap_flicker.start();
 		
 		zaps.clear();
+		enemies.clear();
 		
 		battery_active = true;
 		
@@ -169,6 +174,25 @@ public class Level {
 				zaps.remove(z);
 				
 				z--;
+				
+			}
+			
+		}
+		
+		for (int ep = 0; ep < enemies.size(); ep++) {
+			
+			enemies.get(ep).update(e);
+			
+			if (Dimmer.game.p.killedBy(enemies.get(ep))) {
+				
+				Dimmer.game.game_over();
+				
+			} else if (enemies.get(ep).killed()) {
+				
+				enemies.remove(ep);
+				ep--;
+				
+				kill.play();
 				
 			}
 			
@@ -549,6 +573,7 @@ public class Level {
 		if (battery_active) e.screen.in.render(offset + (int) battery_x + 3, 24 + (int) battery_y - 7 - (int) Math.round(1 * Math.sin(2 * Math.PI * ((bobble) / 360.0))), battery);
 		
 		for (int z = 0; z < zaps.size(); z++) zaps.get(z).render(e);
+		for (int ep = 0; ep < enemies.size(); ep++) enemies.get(ep).render(e);
 		
 	}
 	
